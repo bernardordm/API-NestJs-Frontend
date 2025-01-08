@@ -21,12 +21,12 @@ export default function DataTable({ username, lastName, firstName, email, active
 
   return (
     <tr className='border-b border-gray-200 hover:bg-gray-100 m-2'>
-      <td>{username}</td>
-      <td>{firstName}</td>
-      <td>{lastName}</td>
-      <td>{email}</td>
-      <td>{active}</td>
-      <td>
+      <td className="py-2 px-4">{username}</td>
+      <td className="py-2 px-4">{firstName}</td>
+      <td className="py-2 px-4">{lastName}</td>
+      <td className="py-2 px-4">{email}</td>
+      <td className="py-2 px-4">{active}</td>
+      <td className="py-2 px-4">
         <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded mr-2' onClick={onUpdate}>Update</button>
         <button className='bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-4 rounded mr-2' onClick={handleClickDetails}>Details</button>
         <button className='bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-4 rounded' onClick={onDelete}>Delete</button>

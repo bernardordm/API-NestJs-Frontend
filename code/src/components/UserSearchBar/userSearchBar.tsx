@@ -4,6 +4,10 @@ import Modal from '../NewUserModal/Modal';
 import EditUserModal from '../NewUserModal/EditUserModal';
 import { getAll, createUser, updateUser, deleteUser } from '../../Utils/API'
 import { useNavigate } from "react-router-dom";
+import { useDispatch, UseDispatch, useSelector } from "react-redux";
+import { addUser, fetchUsers, removeUser } from "../../store/usersSlice";
+import { AppDispatch, RootState } from "../../store/store";
+
 
 export default function UserSearchbar() {
     interface User {
@@ -16,8 +20,11 @@ export default function UserSearchbar() {
       active: boolean;
     }
 
-    const [users, setUsers] = useState<User[]>([]);
-    const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
+    const users = useSelector((state: RootState) => state.user.users);
+    const loading = useSelector((state: RootState) => state.user.loading);
+    const error = useSelector((state: RootState) => state.user.error);
+    
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editUser, setEditUser] = useState<User | null>(null);
@@ -32,16 +39,7 @@ export default function UserSearchbar() {
     });
 
     useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const allUsers = await getAll();
-          setUsers(allUsers);
-        } catch (error) {
-          console.error("Erro ao buscar usuários:", error);
-        }
-      };
-  
-      fetchData();
+      dispatch(fetchUsers());
     }, []);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,7 +54,7 @@ export default function UserSearchbar() {
     const handleCreateSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       try {
-        await createUser(newUser);
+        await dispatch(addUser(newUser)).unwrap();
         setIsCreateModalOpen(false);
         const allUsers = await getAll();
         setUsers(allUsers);
@@ -69,7 +67,7 @@ export default function UserSearchbar() {
       e.preventDefault();
       try {
         if (editUser) {
-          await updateUser(editUser);
+          await dispatch(editUser(editUser)).unwrap();
           setIsEditModalOpen(false);
           const allUsers = await getAll();
           setUsers(allUsers);
@@ -86,10 +84,7 @@ export default function UserSearchbar() {
 
     const handleDelete = async (id: string) => {
       try {
-        await deleteUser(id);
-        const allUsers = await getAll();
-        setUsers(allUsers);
-        navigate('/');
+        await dispatch(removeUser(id)).unwrap();
       } catch (error) {
         console.error("Erro ao deletar usuário:", error);
       }
@@ -145,12 +140,12 @@ export default function UserSearchbar() {
           <table className="min-w-full bg-white">
             <thead>
               <tr>
-                <th className="py-2">Username</th>
-                <th className="py-2">First Name</th>
-                <th className="py-2">Last Name</th>
-                <th className="py-2">Email</th>
-                <th className="py-2">Status</th>
-                <th className="py-2">Actions</th>
+                <th className="py-2 px-4">Username</th>
+                <th className="py-2 px-4">First Name</th>
+                <th className="py-2 px-4">Last Name</th>
+                <th className="py-2 px-4">Email</th>
+                <th className="py-2 px-4">Status</th>
+                <th className="py-2 px-4">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -260,4 +255,8 @@ export default function UserSearchbar() {
           )}
         </div>
     );
+}
+
+function setUsers(allUsers: any) {
+  throw new Error("Function not implemented.");
 }
