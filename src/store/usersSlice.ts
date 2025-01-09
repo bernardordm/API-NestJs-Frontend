@@ -18,7 +18,7 @@ interface UsersState {
 }
 
 const initialState: UsersState = {
-  users: [],
+  users: JSON.parse(localStorage.getItem('users') || '[]'),
   loading: false,
   error: null,
   success: false,
@@ -59,6 +59,7 @@ const usersSlice = createSlice({
         state.loading = false;
         state.users = action.payload;
         state.success = true;
+        localStorage.setItem('users', JSON.stringify(state.users));
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;

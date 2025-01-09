@@ -1,12 +1,21 @@
-import React, { useState } from 'react'
-import UserSearchBar from '../../components/UserSearchBar/userSearchBar'
+import React, { useState, useEffect } from 'react';
+import UserSearchBar from '../../components/UserSearchBar/userSearchBar';
 
 export default function UserManagement() {
-  const [search, setSearch] = useState(false);
+  const [search, setSearch] = useState(() => {
+    const savedSearch = localStorage.getItem('search');
+    return savedSearch ? JSON.parse(savedSearch) : false;
+  });
 
   const handleSearchButton = () => {
-    setSearch(!search)
+    const newSearchState = !search;
+    setSearch(newSearchState);
+    localStorage.setItem('search', JSON.stringify(newSearchState));
   };
+
+  useEffect(() => {
+    localStorage.setItem('search', JSON.stringify(search));
+  }, [search]);
 
   return (
     <div className="flex flex-col items-center p-4">
@@ -23,5 +32,5 @@ export default function UserManagement() {
         {search && <UserSearchBar />}
       </div>
     </div>
-  )
+  );
 }
