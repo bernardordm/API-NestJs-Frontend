@@ -4,6 +4,8 @@ import UserManagement from './Pages/UserManagement/UserManagement'
 import UserDetails from './Pages/UserManagement/UserDetails'
 import SignupForm from './components/SignupForm/SignupForm'
 import SignupPage from './Pages/UserManagement/UserSignup'
+import Login from './Pages/Login/Login'
+
 
 function App() {
   return (
@@ -12,7 +14,8 @@ function App() {
       <Route path="/UserManagement" element={ <UserManagement /> }/>
       <Route path="/UserManagement/details/:id" element={ <UserDetails/> }/>
       <Route path="/signup" element={ <SignupPage/> }/>
-    </Routes>
+       <Route path="/login" element={ <Login /> }/>
+        </Routes>
   )
 }
 
