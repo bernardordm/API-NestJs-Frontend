@@ -2,12 +2,9 @@ import { useEffect, useState } from "react";
 import DataTable from '../DataTable'
 import Modal from '../NewUserModal/Modal';
 import EditUserModal from '../NewUserModal/EditUserModal';
-import { getAll, createUser, updateUser, deleteUser } from '../../Utils/API'
-import { useNavigate } from "react-router-dom";
-import { useDispatch, UseDispatch, useSelector } from "react-redux";
-import { addUser, fetchUsers, removeUser } from "../../store/usersSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { addUser, fetchUsers, editUser as editUserAction, removeUser } from "../../store/usersSlice";
 import { AppDispatch, RootState } from "../../store/store";
-
 
 export default function UserSearchbar() {
     interface User {
@@ -40,7 +37,7 @@ export default function UserSearchbar() {
 
     useEffect(() => {
       dispatch(fetchUsers());
-    }, []);
+    }, [dispatch]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value } = e.target;
@@ -56,8 +53,6 @@ export default function UserSearchbar() {
       try {
         await dispatch(addUser(newUser)).unwrap();
         setIsCreateModalOpen(false);
-        const allUsers = await getAll();
-        setUsers(allUsers);
       } catch (error) {
         console.error("Erro ao criar usuário:", error);
       }
@@ -67,10 +62,8 @@ export default function UserSearchbar() {
       e.preventDefault();
       try {
         if (editUser) {
-          await dispatch(editUser(editUser)).unwrap();
+          await dispatch(editUserAction(editUser)).unwrap();
           setIsEditModalOpen(false);
-          const allUsers = await getAll();
-          setUsers(allUsers);
         }
       } catch (error) {
         console.error("Erro ao editar usuário:", error);
@@ -88,7 +81,6 @@ export default function UserSearchbar() {
       } catch (error) {
         console.error("Erro ao deletar usuário:", error);
       }
-
     };
 
     return (
@@ -248,15 +240,10 @@ export default function UserSearchbar() {
               onClose={() => setIsEditModalOpen(false)}
               user={editUser}
               onUpdate={async () => {
-                const allUsers = await getAll();
-                setUsers(allUsers);
+                await dispatch(fetchUsers()).unwrap();
               }}
             />
           )}
         </div>
     );
-}
-
-function setUsers(allUsers: any) {
-  throw new Error("Function not implemented.");
 }
