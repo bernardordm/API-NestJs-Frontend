@@ -27,11 +27,6 @@ const SignupForm = () => {
     dispatch(addUser({ ...newUser, id: Date.now().toString(), active: true }));
   };
 
-  useEffect(() => {
-    if (success) {
-      navigate('/login');
-    }
-  }, [success, navigate]);
 
   return (
     <div className="w-full max-w-4xl bg-grey-200">

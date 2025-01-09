@@ -16,7 +16,7 @@ export default function DataTable({ username, lastName, firstName, email, active
   const navigate = useNavigate();
 
   const handleClickDetails = () => {
-    navigate(`/details/${id}`);
+    navigate(`/usermanagement/details/${id}`);
   }
 
   return (
