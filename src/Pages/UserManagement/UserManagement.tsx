@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import UserSearchBar from '../../components/UserSearchBar/userSearchBar';
+import React, { useEffect, useState } from 'react'
+import UserSearchBar from '../../components/UserSearchBar/userSearchBar'
 
 export default function UserManagement() {
   const [search, setSearch] = useState(() => {
@@ -15,7 +15,7 @@ export default function UserManagement() {
 
   useEffect(() => {
     localStorage.setItem('search', JSON.stringify(search));
-  }, [search]);
+  }, [search]);
 
   return (
     <div className="flex flex-col items-center p-4">
@@ -32,5 +32,5 @@ export default function UserManagement() {
         {search && <UserSearchBar />}
       </div>
     </div>
-  );
+  )
 }

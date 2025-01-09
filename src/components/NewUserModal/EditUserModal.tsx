@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import Modal from './Modal';
-import { updateUser } from '../../Utils/API';
+import { editUser as editUserAction } from '../../store/usersSlice';
+import { AppDispatch } from '../../store/store';
 
 interface User {
   id: string;
@@ -20,6 +22,7 @@ interface EditUserModalProps {
 
 export default function EditUserModal({ isOpen, onClose, user, onUpdate }: EditUserModalProps) {
   const [editUser, setEditUser] = useState<User | null>(user);
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     setEditUser(user);
@@ -36,7 +39,7 @@ export default function EditUserModal({ isOpen, onClose, user, onUpdate }: EditU
     e.preventDefault();
     try {
       if (editUser) {
-        await updateUser(editUser);
+        await dispatch(editUserAction(editUser)).unwrap();
         onUpdate();
         onClose();
       }

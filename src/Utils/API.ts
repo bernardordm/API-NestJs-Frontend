@@ -82,5 +82,5 @@ export const deleteUser = async (id: string) => {
   if (!response.ok) {
     throw new Error('Erro ao deletar usuário');
   }
-  return response.json();
+  return id;
 };

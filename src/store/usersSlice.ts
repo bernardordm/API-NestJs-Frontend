@@ -21,7 +21,7 @@ const initialState: UsersState = {
   users: JSON.parse(localStorage.getItem('users') || '[]'),
   loading: false,
   error: null,
-  success: false,
+  success: false,
 };
 
 export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
@@ -86,6 +86,7 @@ const usersSlice = createSlice({
         state.loading = false;
         state.users = state.users.filter((user) => user.id !== action.payload);
         state.success = true;
+        state.error = null;
       })
       .addCase(removeUser.rejected, (state, action) => {
         state.loading = false;

@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
-import { fetchById, deleteUser } from '../../Utils/API';
 import { useParams, useNavigate } from 'react-router-dom';
 import EditUserModal from '../../components/NewUserModal/EditUserModal';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUsers, removeUser, editUser as editUserAction } from '../../store/usersSlice';
+import { AppDispatch, RootState } from '../../store/store';
 
 interface User {
   id: string;
@@ -14,29 +16,27 @@ interface User {
 
 export default function UserDetails() {
   const { id } = useParams<{ id: string }>();
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const users = useSelector((state: RootState) => state.user.users);
   const [user, setUser] = useState<User | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (id) {
-          const userData = await fetchById(id);
-          setUser(userData);
-        }
-      } catch (error) {
-        console.error("Erro ao buscar usuário:", error);
-      }
-    };
+    dispatch(fetchUsers());
+  }, [dispatch]);
 
-    fetchData();
-  }, [id]);
+  useEffect(() => {
+    if (id) {
+      const foundUser = users.find((user) => user.id === id);
+      setUser(foundUser || null);
+    }
+  }, [id, users]);
 
   const handleDelete = async () => {
     try {
       if (id) {
-        await deleteUser(id);
+        await dispatch(removeUser(id)).unwrap();
         navigate('/'); // Redireciona para a lista de usuários após a exclusão
       }
     } catch (error) {
@@ -44,17 +44,17 @@ export default function UserDetails() {
     }
   };
 
+  const handleClickBack = () => {
+    navigate('/');
+  };
+
   if (!user) {
     return <div>Carregando...</div>;
   }
 
-  const handleClickBack = () => {
-    navigate('/');
-  }
-
   return (
     <div>
-      <ul className=" text-lg list-disc list-inside p-4 bg-gray-100 rounded-lg shadow-md w-1/2 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+      <ul className="text-lg list-disc list-inside p-4 bg-gray-100 rounded-lg shadow-md w-1/2 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
         <li className='py-3'>Username: {user.username}</li>
         <li className='py-3'>First Name: {user.firstName}</li>
         <li className='py-3'>Last Name: {user.lastName}</li>
@@ -79,8 +79,11 @@ export default function UserDetails() {
           onClose={() => setIsEditModalOpen(false)}
           user={user}
           onUpdate={async () => {
-            const updatedUser = await fetchById(id!);
-            setUser(updatedUser);
+            await dispatch(fetchUsers()).unwrap();
+            const updatedUser = users.find((u) => u.id === user.id);
+            if (updatedUser) {
+              setUser(updatedUser);
+            }
           }}
         />
       )}
