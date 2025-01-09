@@ -49,9 +49,9 @@ function Login() {
       <div className="flex items-center">
         <img src={logo} alt="M2C Digital Logo" style={{ width: '300px' }} />
       </div>
-      <h2 className="text-xl font-semibold text-gray-700">Acesse sua Conta</h2>
+      <h2 className="text-xl font-semibold text-gray-700 pt-5 pb-3">Acesse sua Conta</h2>
       <form
-        className="flex p-3 flex-col bg-white shadow-lg rounded-lg"
+        className="flex p-10 flex-col bg-white shadow-lg rounded-lg"
         onSubmit={handleLogin}
       >
         <label

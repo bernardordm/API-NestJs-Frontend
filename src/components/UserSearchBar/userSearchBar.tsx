@@ -92,7 +92,7 @@ export default function UserSearchbar() {
               className="h-10 bg-white w-72 text-black mr-2 p-2 border border-gray-300 rounded"
             />
             <button
-              className="flex items-center justify-center bg-primary text-white border-none p-2 rounded cursor-pointer"
+              className="flex items-center justify-center bg-cyan-700 text-white border-none p-2 rounded cursor-pointer"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -110,7 +110,7 @@ export default function UserSearchbar() {
               </svg>
             </button>
             <button
-              className="flex items-center justify-center bg-primary text-white border-none p-2 rounded cursor-pointer ml-2"
+              className="flex items-center justify-center bg-cyan-700 text-white border-none p-2 rounded cursor-pointer ml-2"
               onClick={() => setIsCreateModalOpen(true)}
             >
               <svg

@@ -31,7 +31,7 @@ const SignupForm = () => {
   return (
     <div className="w-full max-w-4xl bg-grey-200">
       <div className="bg-white shadow-md rounded-lg p-8 border border-gray-200 w-full">
-        <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
+        <h2 className="text-2xl text-cyan-700 font-bold mb-6 text-center">Sign Up</h2>
         {error && <p className="text-red-500 text-center">{error}</p>}
         <form onSubmit={handleCreateSubmit}>
           <div className="mb-4">
@@ -41,7 +41,7 @@ const SignupForm = () => {
               name="username"
               value={newUser.username}
               onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-cyan-500 focus:shadow-outline"
               required
             />
           </div>
@@ -52,18 +52,18 @@ const SignupForm = () => {
               name="password"
               value={newUser.password}
               onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 focus:ring-cyan-500 leading-tight focus:outline-none focus:shadow-outline"
               required
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="firstName">First Name</label>
+            <label className="block text-gray-700 text-sm font-bold focus:ring-cyan-500 mb-2" htmlFor="firstName">First Name</label>
             <input
               type="text"
               name="firstName"
               value={newUser.firstName}
               onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 focus:ring-cyan-500 leading-tight focus:outline-none focus:shadow-outline"
               required
             />
           </div>
@@ -74,7 +74,7 @@ const SignupForm = () => {
               name="lastName"
               value={newUser.lastName}
               onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 focus:ring-cyan-500 leading-tight focus:outline-none focus:shadow-outline"
               required
             />
           </div>
@@ -85,21 +85,21 @@ const SignupForm = () => {
               name="email"
               value={newUser.email}
               onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="shadow appearance-none border rounded w-full py-2 px-3 focus:ring-cyan-500 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               required
             />
           </div>
           <div className="flex items-center justify-between">
             <button
               type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className="bg-sky-900 hover:bg-sky-950 text-white font-bold py-2 w-60 rounded focus:outline-none focus:shadow-outline"
               disabled={loading}
             >
-              {loading ? 'Submitting...' : 'Cadastrar'}
+              {loading ? 'Submitting...' : 'Sign Up'}
             </button>
             <button
               type="button"
-              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 w-60 rounded focus:outline-none focus:shadow-outline"
               onClick={() => console.log('Cancel')}
             >
               Cancelar

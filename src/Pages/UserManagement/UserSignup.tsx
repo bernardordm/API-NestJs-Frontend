@@ -6,7 +6,7 @@ const SignupPage = () => {
   return (
     <><Header /><div className="flex w-full h-screen">
           <Aside />
-          <div className="flex-grow flex justify-center items-center">
+          <div className="flex-grow flex justify-center items-center bg-gray-200">
               <SignupForm />
           </div>
       </div></>

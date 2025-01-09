@@ -45,7 +45,7 @@ export default function UserDetails() {
   };
 
   const handleClickBack = () => {
-    navigate('/');
+    navigate('/usermanagement');
   };
 
   if (!user) {
