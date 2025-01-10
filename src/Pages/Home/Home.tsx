@@ -1,5 +1,5 @@
-import Aside from "../../components/Aside/Aside";
-import Header from "../../components/Header/Header";
+import Aside from '../../components/Aside/Aside';
+import Header from '../../components/Header/Header';
 import logo from '../../assets/logo-1.png';
 
 const Home = () => {

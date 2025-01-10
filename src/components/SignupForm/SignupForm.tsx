@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import { addUser } from '../../store/usersSlice';
@@ -15,18 +15,22 @@ const SignupForm = () => {
   });
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error, success } = useSelector((state: RootState) => state.user);
+  const { loading, error } = useSelector((state: RootState) => state.user);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewUser({ ...newUser, [name]: value });
   };
 
-  const handleCreateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    dispatch(addUser({ ...newUser, id: Date.now().toString(), active: true }));
+    try {
+      await dispatch(addUser({ ...newUser, id: Date.now().toString(), active: true })).unwrap();
+      navigate('/'); // Redireciona para a tela de login após o cadastro
+    } catch (error) {
+      console.error("Erro ao cadastrar usuário:", error);
+    }
   };
-
 
   return (
     <div className="w-full max-w-4xl bg-grey-200">
@@ -100,7 +104,7 @@ const SignupForm = () => {
             <button
               type="button"
               className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 w-60 rounded focus:outline-none focus:shadow-outline"
-              onClick={() => console.log('Cancel')}
+              onClick={() => navigate('/')}
             >
               Cancelar
             </button>

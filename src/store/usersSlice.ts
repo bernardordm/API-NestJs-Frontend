@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getAll, createUser, updateUser, deleteUser } from '../Utils/API';
+import { getAll, createUser, updateUser, deleteUser, signIn } from '../Utils/API';
 
 interface User {
   id: string;
@@ -15,6 +15,7 @@ interface UsersState {
   loading: boolean;
   error: string | null;
   success: boolean;
+  token: string | null;
 }
 
 const initialState: UsersState = {
@@ -22,6 +23,7 @@ const initialState: UsersState = {
   loading: false,
   error: null,
   success: false,
+  token: localStorage.getItem('token')
 };
 
 export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
@@ -42,6 +44,11 @@ export const editUser = createAsyncThunk('users/editUser', async (updatedUser: U
 export const removeUser = createAsyncThunk('users/removeUser', async (id: string) => {
   await deleteUser(id);
   return id;
+});
+
+export const login = createAsyncThunk('users/login', async (credentials: { email: string, password: string }) => {
+  const response = await signIn(credentials.email, credentials.password);
+  return response;
 });
 
 const usersSlice = createSlice({
@@ -92,7 +99,31 @@ const usersSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || 'Failed to delete user';
         state.success = false;
+      })
+
+      .addCase(login.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      
+      .addCase(login.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.success = true;
+        state.token = action.payload;
+        if (state.token) {
+          localStorage.setItem('token', state.token);
+        }
+        
+      })
+
+      .addCase (login.rejected, (state, action) => {      
+        state.loading = false;
+        state.error = action.error.message || 'Failed to login';
+        state.success = false;
       });
+
   },
 });
 

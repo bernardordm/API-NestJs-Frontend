@@ -1,7 +1,5 @@
-import { configureStore, createAsyncThunk } from "@reduxjs/toolkit";
+import { configureStore,} from "@reduxjs/toolkit";
 import usersReducer from "./usersSlice";
-import { createUser, getAll } from "../Utils/API";
-
 const store = configureStore({
     reducer:{
         user: usersReducer,

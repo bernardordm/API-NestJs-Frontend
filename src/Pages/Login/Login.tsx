@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import logo from '../../assets/logo-1.png';
+import { login } from '../../store/usersSlice';
+import { AppDispatch, RootState } from '../../store/store';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 function Login() {
@@ -7,6 +10,14 @@ function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const dispatch = useDispatch<AppDispatch>();
+  const { success, loading } = useSelector((state: RootState) => state.user);
+
+  useEffect(() => {
+    if (success) {
+      navigate('/home');
+    }
+  }, [success, navigate]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +37,7 @@ function Login() {
     }
 
     setError('');
-    navigate('/UserManagement');
+    dispatch(login({ email, password }));
   };
 
   const handleCloseError = () => {
@@ -87,8 +98,9 @@ function Login() {
         <button
           className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           type="submit"
+          disabled={loading}
         >
-          Submit
+          {loading ? 'Loading...' : 'Submit'}
         </button>
       </form>
     </div>
