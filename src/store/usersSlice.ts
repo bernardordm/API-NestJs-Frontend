@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getAll, createUser, updateUser, deleteUser, signIn } from '../Utils/API';
+import { getAll, createUser, updateUser, deleteUser, signIn, fetchById } from '../Utils/API';
 
 interface User {
   id: string;
@@ -16,14 +16,18 @@ interface UsersState {
   error: string | null;
   success: boolean;
   token: string | null;
+  selectedUser: User | null;
+  isSlideOpen: boolean;
 }
 
 const initialState: UsersState = {
   users: JSON.parse(localStorage.getItem('users') || '[]'),
   loading: false,
   error: null,
-  success: false,
-  token: localStorage.getItem('token')
+  success: false,
+  token: localStorage.getItem('token'),
+  selectedUser: null,
+  isSlideOpen: false,
 };
 
 export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
@@ -51,10 +55,24 @@ export const login = createAsyncThunk('users/login', async (credentials: { email
   return response;
 });
 
+export const userDetails = createAsyncThunk('users/userDetails', async (id: string) => {
+  const response = await fetchById(id);
+  return response;
+});
+
 const usersSlice = createSlice({
   name: 'users',
   initialState,
-  reducers: {},
+  reducers: {
+    openSlide: (state, action) => {
+      state.selectedUser = action.payload;
+      state.isSlideOpen = true;
+    },
+    closeSlide: (state) => {
+      state.isSlideOpen = false;
+      state.selectedUser = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchUsers.pending, (state) => {
@@ -122,9 +140,25 @@ const usersSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || 'Failed to login';
         state.success = false;
-      });
+      })
 
+      .addCase(userDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(userDetails.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.success = true;
+      })
+      .addCase(userDetails.rejected, (state) => {
+        state.loading = false;
+        state.error = 'Failed to fetch user details';
+        state.success = false;
+      })
   },
 });
 
+export const { openSlide, closeSlide } = usersSlice.actions;
 export default usersSlice.reducer;

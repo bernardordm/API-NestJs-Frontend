@@ -1,4 +1,6 @@
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { openSlide } from '../../store/usersSlice';
 
 interface DataTableProps {
   username: string;
@@ -13,11 +15,11 @@ interface DataTableProps {
 }
 
 export default function DataTable({ username, lastName, firstName, email, active, id, onUpdate, onDelete }: DataTableProps) {
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleClickDetails = () => {
-    navigate(`/usermanagement/details/${id}`);
-  }
+    dispatch(openSlide({ username, lastName, firstName, email, active, id }));
+  };
 
   return (
     <tr className='border-b border-gray-200 hover:bg-gray-100 m-2'>

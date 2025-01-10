@@ -5,6 +5,7 @@ import EditUserModal from '../NewUserModal/EditUserModal';
 import { useDispatch, useSelector } from "react-redux";
 import { addUser, fetchUsers, editUser as editUserAction, removeUser } from "../../store/usersSlice";
 import { AppDispatch, RootState } from "../../store/store";
+import UserDetailsSlide from "../UserDetails/UserDetailsSlide";
 
 export default function UserSearchbar() {
     interface User {
@@ -82,6 +83,10 @@ export default function UserSearchbar() {
         console.error("Erro ao deletar usuário:", error);
       }
     };
+
+    const isSlideOpen = useSelector((state: RootState) => state.user.isSlideOpen);
+    const selectedUser = useSelector((state: RootState) => state.user.selectedUser);
+  
 
     return (
         <div className="flex flex-col items-center p-4">
@@ -244,6 +249,16 @@ export default function UserSearchbar() {
               }}
             />
           )}
+               {isSlideOpen && selectedUser && (
+              <UserDetailsSlide
+          username={selectedUser.username}
+          lastName={selectedUser.lastName}
+          firstName={selectedUser.firstName}
+          email={selectedUser.email}
+          active={selectedUser.active ? 'Active' : 'Inactive'}
+          id={selectedUser.id}
+        />
+      )}
         </div>
     );
 }
