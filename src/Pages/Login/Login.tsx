@@ -15,7 +15,7 @@ function Login() {
 
   useEffect(() => {
     if (success) {
-      navigate('/home');
+      navigate('/');
     }
   }, [success, navigate]);
 

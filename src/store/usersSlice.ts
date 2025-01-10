@@ -72,6 +72,10 @@ const usersSlice = createSlice({
       state.isSlideOpen = false;
       state.selectedUser = null;
     },
+    logout: (state) =>{
+      state.token = null;
+      localStorage.removeItem('token');
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -160,5 +164,5 @@ const usersSlice = createSlice({
   },
 });
 
-export const { openSlide, closeSlide } = usersSlice.actions;
+export const { openSlide, closeSlide, logout } = usersSlice.actions;
 export default usersSlice.reducer;

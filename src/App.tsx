@@ -9,12 +9,12 @@ import Home from '../src/Pages/Home/Home';
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
+      <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/UserManagement" element={<UserManagement />} />
       <Route path="/UserManagement/details/:id" element={<UserDetails />} />
       <Route path="/signup" element={<SignupPage />} />
-      <Route path="/home" element={<Home />} />
+      <Route path="/home" element={<Login />} />
     </Routes>
   );
 }
