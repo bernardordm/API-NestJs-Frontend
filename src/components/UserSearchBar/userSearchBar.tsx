@@ -3,9 +3,10 @@ import DataTable from '../DataTable'
 import Modal from '../NewUserModal/Modal';
 import EditUserModal from '../NewUserModal/EditUserModal';
 import { useDispatch, useSelector } from "react-redux";
-import { addUser, fetchUsers, editUser as editUserAction, removeUser } from "../../store/usersSlice";
+import { addUser, fetchUsers, editUser as editUserAction, removeUser, searchUser } from "../../store/usersSlice";
 import { AppDispatch, RootState } from "../../store/store";
 import UserDetailsSlide from "../UserDetails/UserDetailsSlide";
+import { fetchPage } from "../../Utils/API";
 
 export default function UserSearchbar() {
     interface User {
@@ -35,6 +36,8 @@ export default function UserSearchbar() {
       email: '',
       active: true
     });
+    const [searchTerm, setSearchTerm] = useState('');
+    const [pageIndex, setPageIndex] = useState(0);
 
     useEffect(() => {
       dispatch(fetchUsers());
@@ -84,6 +87,26 @@ export default function UserSearchbar() {
       }
     };
 
+    const handleSearch = async () => {
+      try{
+        await dispatch(searchUser(searchTerm)).unwrap(); 
+      }
+      catch(error){
+        console.error("Erro ao buscar usuário:", error);
+      }
+    }
+
+    const handlePageChange = async (newPageIndex: number) => {
+      try {
+      const users = await fetchPage(newPageIndex, searchTerm);
+      dispatch({type: 'users/fetchUsers/fulfilled', payload: users});
+      setPageIndex(newPageIndex);
+      }
+      catch (error) {
+        console.error("Erro ao buscar usuários")
+      }
+  }
+
     const isSlideOpen = useSelector((state: RootState) => state.user.isSlideOpen);
     const selectedUser = useSelector((state: RootState) => state.user.selectedUser);
   
@@ -94,9 +117,12 @@ export default function UserSearchbar() {
             <input
               type="text"
               placeholder="Buscar"
-              className="h-10 bg-white w-72 text-black mr-2 p-2 border border-gray-300 rounded"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
+            
             <button
+            onClick={handleSearch}
               className="flex items-center justify-center bg-cyan-700 text-white border-none p-2 rounded cursor-pointer"
             >
               <svg
@@ -162,6 +188,9 @@ export default function UserSearchbar() {
               )}
             </tbody>
           </table>
+          <div>
+            
+          </div>
           {isCreateModalOpen && (
             <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)}>
               <h2 className="text-xl font-bold mb-4">Cadastrar Novo Usuário</h2>

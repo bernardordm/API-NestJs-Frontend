@@ -5,6 +5,7 @@ interface User {
   lastName: string;
   email: string;
   active: boolean;
+  index: n
 }
 
 
@@ -98,4 +99,22 @@ export const signIn = async (email: string, password: string) => {
     
   }
   return response.json();
+}
+
+export const search = async (searchTerm: string) => {
+  const response = await fetch(`http://localhost:3000/users/search?pageIndex=0&pageSize=10&sortBy=username&sortOrder=ASC&searchTerm=${searchTerm}`);
+  if (!response.ok) {
+    throw new Error('Erro ao buscar usuários');
+  }
+  const users = await response.json();
+  return users;
+}
+
+export const fetchPage = async (pageIndex: number, searchTerm: string ) => {
+  const response = await fetch (`http://localhost:3000/users/search?pageIndex=${pageIndex}&pageSize=10&sortBy=username&sortOrder=ASC&searchTerm=${searchTerm}`);
+  if(!response.ok) {
+    throw new Error('Erro ao buscar usuários');
+  }
+  const users = await response.json();
+  return users;
 }

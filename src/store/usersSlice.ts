@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getAll, createUser, updateUser, deleteUser, signIn, fetchById } from '../Utils/API';
+import { getAll, createUser, updateUser, deleteUser, signIn, fetchById, search } from '../Utils/API';
 
 interface User {
   id: string;
@@ -57,6 +57,11 @@ export const login = createAsyncThunk('users/login', async (credentials: { email
 
 export const userDetails = createAsyncThunk('users/userDetails', async (id: string) => {
   const response = await fetchById(id);
+  return response;
+});
+
+export const searchUser = createAsyncThunk('users/searchUser', async (searchTerm: string) => {
+  const response = await search(searchTerm);
   return response;
 });
 
@@ -161,6 +166,22 @@ const usersSlice = createSlice({
         state.error = 'Failed to fetch user details';
         state.success = false;
       })
+      .addCase(searchUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(searchUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.users = action.payload;
+        state.success = true;
+      })
+
+      .addCase(searchUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to search users';
+        state.success = false;
+      });
   },
 });
 
