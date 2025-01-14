@@ -1,3 +1,5 @@
+import { current } from "@reduxjs/toolkit";
+
 interface User {
   id: string;
   username: string;
@@ -5,35 +7,27 @@ interface User {
   lastName: string;
   email: string;
   active: boolean;
-  index: n
 }
 
 
-export async function getAll() {
-  const response = await fetch('http://localhost:3000/users');
+export async function getAll(pageNumber: number) {
+  const response = await fetch(`http://localhost:3000/users?limit=10&page=${pageNumber}`);
   if(!response.ok) {
     throw new Error('Sem resposta');
   }
   try {
     const data = await response.json();
-    return data;
-  } catch (error) {
-    return(error);
+    return{
+      data: Array.isArray(data.data) ? data.data : [],
+      totalPages: data.totalPages,
+      currentPage: data.page,
+      totalItems: data.totalItems,
+    }
   }
-};
+  catch(error) {
+    throw new Error('Erro ao buscar usuários');
+  }};
 
-export const fetchByName = async (name: string) => {
-  const response = await fetch(`http://localhost:3000/users/${name}`);
-  if(!response.ok) {
-    throw new Error('Sem resposta');
-  }
-  try {
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    return(error);
-  }
-};
 
 export const fetchById = async (id: string) => {
   const response = await fetch(`http://localhost:3000/users/${id}`);
@@ -99,22 +93,4 @@ export const signIn = async (email: string, password: string) => {
     
   }
   return response.json();
-}
-
-export const search = async (searchTerm: string) => {
-  const response = await fetch(`http://localhost:3000/users/search?pageIndex=0&pageSize=10&sortBy=username&sortOrder=ASC&searchTerm=${searchTerm}`);
-  if (!response.ok) {
-    throw new Error('Erro ao buscar usuários');
-  }
-  const users = await response.json();
-  return users;
-}
-
-export const fetchPage = async (pageIndex: number, searchTerm: string ) => {
-  const response = await fetch (`http://localhost:3000/users/search?pageIndex=${pageIndex}&pageSize=10&sortBy=username&sortOrder=ASC&searchTerm=${searchTerm}`);
-  if(!response.ok) {
-    throw new Error('Erro ao buscar usuários');
-  }
-  const users = await response.json();
-  return users;
 }

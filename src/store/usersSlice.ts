@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getAll, createUser, updateUser, deleteUser, signIn, fetchById, search } from '../Utils/API';
+import { getAll, createUser, updateUser, deleteUser, signIn, fetchById} from '../Utils/API';
 
 interface User {
   id: string;
@@ -17,21 +17,27 @@ interface UsersState {
   success: boolean;
   token: string | null;
   selectedUser: User | null;
-  isSlideOpen: boolean;
+  isSlideOpen: boolean
+  totalPages: number;
+  currentPage: number;
+  totalItems: number;
+
 }
 
 const initialState: UsersState = {
-  users: JSON.parse(localStorage.getItem('users') || '[]'),
+  users: [],
   loading: false,
   error: null,
   success: false,
   token: localStorage.getItem('token'),
   selectedUser: null,
   isSlideOpen: false,
+  totalPages: 0,
+  currentPage: 1,
+  totalItems: 0,
 };
-
-export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
-  const response = await getAll();
+export const fetchUsers = createAsyncThunk('users/fetchUsers', async (pageNumber: number) => {
+  const response = await getAll(pageNumber);
   return response;
 });
 
@@ -60,10 +66,6 @@ export const userDetails = createAsyncThunk('users/userDetails', async (id: stri
   return response;
 });
 
-export const searchUser = createAsyncThunk('users/searchUser', async (searchTerm: string) => {
-  const response = await search(searchTerm);
-  return response;
-});
 
 const usersSlice = createSlice({
   name: 'users',
@@ -91,7 +93,10 @@ const usersSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.loading = false;
-        state.users = action.payload;
+        state.users = action.payload.data;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currentPage;
+        state.totalItems = action.payload.totalItems;
         state.success = true;
         localStorage.setItem('users', JSON.stringify(state.users));
       })
@@ -156,7 +161,7 @@ const usersSlice = createSlice({
         state.error = null;
         state.success = false;
       })
-      .addCase(userDetails.fulfilled, (state, action) => {
+      .addCase(userDetails.fulfilled, (state) => {
         state.loading = false;
         state.error = null;
         state.success = true;
@@ -164,22 +169,6 @@ const usersSlice = createSlice({
       .addCase(userDetails.rejected, (state) => {
         state.loading = false;
         state.error = 'Failed to fetch user details';
-        state.success = false;
-      })
-      .addCase(searchUser.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-        state.success = false;
-      })
-      .addCase(searchUser.fulfilled, (state, action) => {
-        state.loading = false;
-        state.users = action.payload;
-        state.success = true;
-      })
-
-      .addCase(searchUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Failed to search users';
         state.success = false;
       });
   },
