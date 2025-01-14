@@ -1,5 +1,3 @@
-import { current } from "@reduxjs/toolkit";
-
 interface User {
   id: string;
   username: string;
@@ -9,40 +7,38 @@ interface User {
   active: boolean;
 }
 
-
 export async function getAll(pageNumber: number) {
   const response = await fetch(`http://localhost:3000/users?limit=10&page=${pageNumber}`);
-  if(!response.ok) {
+  if (!response.ok) {
     throw new Error('Sem resposta');
   }
   try {
     const data = await response.json();
-    return{
+    return {
       data: Array.isArray(data.data) ? data.data : [],
       totalPages: data.totalPages,
       currentPage: data.page,
       totalItems: data.totalItems,
-    }
-  }
-  catch(error) {
+    };
+  } catch (error) {
     throw new Error('Erro ao buscar usuários');
-  }};
-
+  }
+}
 
 export const fetchById = async (id: string) => {
   const response = await fetch(`http://localhost:3000/users/${id}`);
-  if(!response.ok) {
+  if (!response.ok) {
     throw new Error('Sem resposta');
   }
   try {
     const data = await response.json();
     return data;
   } catch (error) {
-    return(error);
+    return error;
   }
 };
 
-export const createUser = async (user:User) => {
+export const createUser = async (user: User) => {
   const response = await fetch('http://localhost:3000/users', {
     method: 'POST',
     headers: {
@@ -50,7 +46,7 @@ export const createUser = async (user:User) => {
     },
     body: JSON.stringify(user)
   });
-  if(!response.ok) {
+  if (!response.ok) {
     throw new Error('Sem resposta');
   }
   return response.json();
@@ -90,7 +86,24 @@ export const signIn = async (email: string, password: string) => {
   });
   if (!response.ok) {
     throw new Error('Erro ao logar');
-    
   }
   return response.json();
+};
+
+export async function searchUsers(searchTerm: string, pageNumber: number) {
+  const response = await fetch(`http://localhost:3000/users?search=${searchTerm}&limit=10&page=${pageNumber}`);
+  if (!response.ok) {
+    throw new Error('Sem resposta');
+  }
+  try {
+    const data = await response.json();
+    return {
+      data: Array.isArray(data.data) ? data.data : [],
+      totalPages: data.totalPages,
+      currentPage: data.page,
+      totalItems: data.totalItems,
+    };
+  } catch (error) {
+    throw new Error('Erro ao buscar usuários');
+  }
 }

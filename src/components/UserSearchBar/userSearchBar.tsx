@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addUser, fetchUsers, editUser as editUserAction, removeUser } from "../../store/usersSlice";
 import { AppDispatch, RootState } from "../../store/store";
 import UserDetailsSlide from "../UserDetails/UserDetailsSlide";
+import { searchUsers } from "../../Utils/API";
 
 export default function UserSearchbar() {
   interface User {
@@ -19,7 +20,7 @@ export default function UserSearchbar() {
   }
 
   const dispatch = useDispatch<AppDispatch>();
-  const users = useSelector((state: RootState) => state.user.users);
+  const [users, setUsers] = useState<User[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editUser, setEditUser] = useState<User | null>(null);
@@ -35,14 +36,32 @@ export default function UserSearchbar() {
   const [searchTerm, setSearchTerm] = useState('');
   const [pageIndex, setPageIndex] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       const response = await dispatch(fetchUsers(pageIndex)).unwrap();
+      setUsers(response.data);
       setTotalPages(response.totalPages);
     };
     fetchData();
   }, [dispatch, pageIndex]);
+
+  useEffect(() => {
+    const fetchSearchResults = async () => {
+      if (isSearching) {
+        const response = await searchUsers(searchTerm, pageIndex);
+        setUsers(response.data);
+        setTotalPages(response.totalPages);
+        setIsSearching(false);
+      } else {
+        const response = await dispatch(fetchUsers(pageIndex)).unwrap();
+        setUsers(response.data);
+        setTotalPages(response.totalPages);
+      }
+    };
+    fetchSearchResults();
+  }, [isSearching, searchTerm, pageIndex, dispatch]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -63,18 +82,6 @@ export default function UserSearchbar() {
     }
   };
 
-  const handleEditSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      if (editUser) {
-        await dispatch(editUserAction(editUser)).unwrap();
-        setIsEditModalOpen(false);
-      }
-    } catch (error) {
-      console.error("Erro ao editar usuário:", error);
-    }
-  };
-
   const handleEditButtonClick = (user: User) => {
     setEditUser(user);
     setIsEditModalOpen(true);
@@ -86,6 +93,10 @@ export default function UserSearchbar() {
     } catch (error) {
       console.error("Erro ao deletar usuário:", error);
     }
+  };
+
+  const handleSearch = () => {
+    setIsSearching(true);
   };
 
   const isSlideOpen = useSelector((state: RootState) => state.user.isSlideOpen);
@@ -102,6 +113,7 @@ export default function UserSearchbar() {
         />
         <button
           className="flex items-center justify-center bg-cyan-700 text-white border-none p-2 rounded cursor-pointer"
+          onClick={handleSearch}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -168,15 +180,15 @@ export default function UserSearchbar() {
       </table>
       <div className="flex justify-between mt-4">
         <button
-          className="bg-gray-500 text-white py-2 px-4 rounded"
+          className="bg-cyan-700 text-white py- px-4 rounded"
           onClick={() => setPageIndex((prev) => Math.max(prev - 1, 1))}
           disabled={pageIndex === 1}
         >
           Anterior
         </button>
-        <span>Página {pageIndex} de {totalPages}</span>
+        <span className="m-4 ">Página {pageIndex} de {totalPages}</span>
         <button
-          className="bg-gray-500 text-white py-2 px-4 rounded"
+          className="bg-cyan-700 text-white py-1 px-4 rounded"
           onClick={() => setPageIndex((prev) => Math.min(prev + 1, totalPages))}
           disabled={pageIndex === totalPages}
         >

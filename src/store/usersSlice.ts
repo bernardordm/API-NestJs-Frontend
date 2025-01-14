@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getAll, createUser, updateUser, deleteUser, signIn, fetchById} from '../Utils/API';
+import { getAll, createUser, updateUser, deleteUser, signIn, fetchById, searchUsers} from '../Utils/API';
 
 interface User {
   id: string;
@@ -66,6 +66,10 @@ export const userDetails = createAsyncThunk('users/userDetails', async (id: stri
   return response;
 });
 
+export const searchUsersThunk = createAsyncThunk('users/searchUsers', async ({ searchTerm, pageNumber }: { searchTerm: string, pageNumber: number }) => {
+  const response = await searchUsers(searchTerm, pageNumber);
+  return response;
+});
 
 const usersSlice = createSlice({
   name: 'users',
@@ -169,6 +173,25 @@ const usersSlice = createSlice({
       .addCase(userDetails.rejected, (state) => {
         state.loading = false;
         state.error = 'Failed to fetch user details';
+        state.success = false;
+      })
+      .addCase(searchUsersThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(searchUsersThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.users = action.payload.data;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currentPage;
+        state.totalItems = action.payload.totalItems;
+        state.success = true;
+        localStorage.setItem('users', JSON.stringify(state.users));
+      })
+      .addCase(searchUsersThunk.rejected, (state, action) => { 
+        state.loading = false;
+        state.error = action.error.message || 'Failed to search users';
         state.success = false;
       });
   },
