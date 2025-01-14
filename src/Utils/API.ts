@@ -91,7 +91,7 @@ export const signIn = async (email: string, password: string) => {
 };
 
 export async function searchUsers(searchTerm: string, pageNumber: number) {
-  const response = await fetch(`http://localhost:3000/users?search=${searchTerm}&limit=10&page=${pageNumber}`);
+  const response = await fetch(`http://localhost:3000/users/search?searchTerm=${searchTerm}&page=${pageNumber}&limit=10&sortBy=username&sortOrder=ASC`);
   if (!response.ok) {
     throw new Error('Sem resposta');
   }
@@ -100,7 +100,7 @@ export async function searchUsers(searchTerm: string, pageNumber: number) {
     return {
       data: Array.isArray(data.data) ? data.data : [],
       totalPages: data.totalPages,
-      currentPage: data.page,
+      currentPage: data.currentPage, // Certifique-se de que currentPage está correto
       totalItems: data.totalItems,
     };
   } catch (error) {

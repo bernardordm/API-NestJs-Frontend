@@ -34,9 +34,8 @@ export default function UserSearchbar() {
     active: true
   });
   const [searchTerm, setSearchTerm] = useState('');
-  const [pageIndex, setPageIndex] = useState(1);
+  const [pageIndex, setPageIndex] = useState<number>(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,22 +46,34 @@ export default function UserSearchbar() {
     fetchData();
   }, [dispatch, pageIndex]);
 
-  useEffect(() => {
-    const fetchSearchResults = async () => {
-      if (isSearching) {
-        const response = await searchUsers(searchTerm, pageIndex);
-        setUsers(response.data);
-        setTotalPages(response.totalPages);
-        setIsSearching(false);
-      } else {
-        const response = await dispatch(fetchUsers(pageIndex)).unwrap();
-        setUsers(response.data);
-        setTotalPages(response.totalPages);
-      }
-    };
-    fetchSearchResults();
-  }, [isSearching, searchTerm, pageIndex, dispatch]);
-
+  const handleSearch = async () => {
+    setPageIndex(1); // Reset page index on search
+    if (searchTerm) {
+      const response = await searchUsers(searchTerm, 1);
+      setUsers(response.data);
+      setTotalPages(response.totalPages);
+    } else {
+      const response = await dispatch(fetchUsers(1)).unwrap();
+      setUsers(response.data);
+      setTotalPages(response.totalPages);
+    }
+  };
+  const handlePageChange = async (newPageIndex: number) => {
+    if (isNaN(newPageIndex) || newPageIndex < 1 || newPageIndex > totalPages) {
+      return;
+    }
+    setPageIndex(newPageIndex);
+    if (searchTerm) {
+      const response = await searchUsers(searchTerm, newPageIndex);
+      setUsers(response.data);
+      setTotalPages(response.totalPages);
+    } else {
+      const response = await dispatch(fetchUsers(newPageIndex)).unwrap();
+      setUsers(response.data);
+      setTotalPages(response.totalPages);
+    }
+  };
+ 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (editUser) {
@@ -93,10 +104,6 @@ export default function UserSearchbar() {
     } catch (error) {
       console.error("Erro ao deletar usuário:", error);
     }
-  };
-
-  const handleSearch = () => {
-    setIsSearching(true);
   };
 
   const isSlideOpen = useSelector((state: RootState) => state.user.isSlideOpen);
@@ -179,21 +186,21 @@ export default function UserSearchbar() {
         </tbody>
       </table>
       <div className="flex justify-between mt-4">
-        <button
-          className="bg-cyan-700 text-white py- px-4 rounded"
-          onClick={() => setPageIndex((prev) => Math.max(prev - 1, 1))}
-          disabled={pageIndex === 1}
-        >
-          Anterior
-        </button>
-        <span className="m-4 ">Página {pageIndex} de {totalPages}</span>
-        <button
-          className="bg-cyan-700 text-white py-1 px-4 rounded"
-          onClick={() => setPageIndex((prev) => Math.min(prev + 1, totalPages))}
-          disabled={pageIndex === totalPages}
-        >
-          Próxima
-        </button>
+     <button
+  className="bg-cyan-700 text-white py- px-4 rounded"
+  onClick={() => handlePageChange(pageIndex - 1)}
+  disabled={pageIndex === 1}
+>
+  Anterior
+</button>
+<span className="m-4 ">Página {pageIndex} de {totalPages}</span>
+<button
+  className="bg-cyan-700 text-white py-1 px-4 rounded"
+  onClick={() => handlePageChange(pageIndex + 1)}
+  disabled={pageIndex === totalPages}
+>
+  Próxima
+</button>
       </div>
       {isCreateModalOpen && (
         <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)}>
