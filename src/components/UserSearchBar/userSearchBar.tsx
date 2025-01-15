@@ -1,9 +1,13 @@
-import { useEffect, useState } from "react";
-import DataTable from '../DataTable'
-import Modal from '../NewUserModal/Modal';
-import EditUserModal from '../NewUserModal/EditUserModal';
+import { useEffect, useRef, useState } from "react";
+import DataTable from "../DataTable";
+import Modal from "../NewUserModal/Modal";
+import EditUserModal from "../NewUserModal/EditUserModal";
 import { useDispatch, useSelector } from "react-redux";
-import { addUser, fetchUsers, editUser as editUserAction, removeUser } from "../../store/usersSlice";
+import {
+  addUser,
+  fetchUsers,
+  removeUser,
+} from "../../store/usersSlice";
 import { AppDispatch, RootState } from "../../store/store";
 import UserDetailsSlide from "../UserDetails/UserDetailsSlide";
 import { searchUsers } from "../../Utils/API";
@@ -25,35 +29,54 @@ export default function UserSearchbar() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editUser, setEditUser] = useState<User | null>(null);
   const [newUser, setNewUser] = useState<User>({
-    id: '',
-    username: '',
-    password: '',
-    firstName: '',
-    lastName: '',
-    email: '',
-    active: true
+    id: "",
+    username: "",
+    password: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    active: true,
   });
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [pageIndex, setPageIndex] = useState<number>(1);
   const [totalPages, setTotalPages] = useState(1);
+  const isInitialMount = useRef(true);
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await dispatch(fetchUsers(pageIndex)).unwrap();
-      setUsers(response.data);
-      setTotalPages(response.totalPages);
+      if (isSearching) {
+        const response = await searchUsers(searchTerm, pageIndex);
+        console.log("Search response:", response);
+        setUsers(response.data);
+        setTotalPages(response.totalPages);
+      } else {
+        const response = await dispatch(fetchUsers(pageIndex)).unwrap();
+        console.log("Fetch response:", response);
+        setUsers(response.data);
+        setTotalPages(response.totalPages);
+      }
     };
-    fetchData();
-  }, [dispatch, pageIndex]);
+
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+    } else {
+      fetchData();
+    }
+  }, [dispatch, pageIndex, isSearching]);
 
   const handleSearch = async () => {
-    setPageIndex(1); // Reset page index on search
+    setPageIndex(1);
+    setIsSearching(true);
+    console.log("Searching for:", searchTerm); // Reset page index on search
     if (searchTerm) {
       const response = await searchUsers(searchTerm, 1);
+      console.log("Search response:", response);
       setUsers(response.data);
       setTotalPages(response.totalPages);
     } else {
       const response = await dispatch(fetchUsers(1)).unwrap();
+      console.log("Fetch response:", response);
       setUsers(response.data);
       setTotalPages(response.totalPages);
     }
@@ -63,17 +86,20 @@ export default function UserSearchbar() {
       return;
     }
     setPageIndex(newPageIndex);
-    if (searchTerm) {
+    console.log("Changing to page:", newPageIndex);
+    if (isSearching) {
       const response = await searchUsers(searchTerm, newPageIndex);
+      console.log("Search response:", response);
       setUsers(response.data);
       setTotalPages(response.totalPages);
     } else {
       const response = await dispatch(fetchUsers(newPageIndex)).unwrap();
+      console.log("Fetch response:", response);
       setUsers(response.data);
       setTotalPages(response.totalPages);
     }
   };
- 
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (editUser) {
@@ -107,7 +133,9 @@ export default function UserSearchbar() {
   };
 
   const isSlideOpen = useSelector((state: RootState) => state.user.isSlideOpen);
-  const selectedUser = useSelector((state: RootState) => state.user.selectedUser);
+  const selectedUser = useSelector(
+    (state: RootState) => state.user.selectedUser
+  );
 
   return (
     <div className="flex flex-col items-center p-4">
@@ -169,12 +197,12 @@ export default function UserSearchbar() {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => 
+          {users.map((user) => (
             <DataTable
-              key={ user.id }
-              id={ user.id }
-              username={ user.username }
-              firstName={ user.firstName }
+              key={user.id}
+              id={user.id}
+              username={user.username}
+              firstName={user.firstName}
               lastName={user.lastName}
               email={user.email}
               active={user.active ? "Active" : "Inactive"}
@@ -182,32 +210,42 @@ export default function UserSearchbar() {
               onDetails={() => console.log(`Details ${user.id}`)}
               onDelete={() => handleDelete(user.id)}
             />
-          )}
+          ))}
         </tbody>
       </table>
       <div className="flex justify-between mt-4">
-     <button
-  className="bg-cyan-700 text-white py- px-4 rounded"
-  onClick={() => handlePageChange(pageIndex - 1)}
-  disabled={pageIndex === 1}
->
-  Anterior
-</button>
-<span className="m-4 ">Página {pageIndex} de {totalPages}</span>
-<button
-  className="bg-cyan-700 text-white py-1 px-4 rounded"
-  onClick={() => handlePageChange(pageIndex + 1)}
-  disabled={pageIndex === totalPages}
->
-  Próxima
-</button>
+        <button
+          className="bg-cyan-700 text-white py- px-4 rounded"
+          onClick={() => handlePageChange(pageIndex - 1)}
+          disabled={pageIndex === 1}
+        >
+          Anterior
+        </button>
+        <span className="m-4 ">
+          Página {pageIndex} de {totalPages}
+        </span>
+        <button
+          className="bg-cyan-700 text-white py-1 px-4 rounded"
+          onClick={() => handlePageChange(pageIndex + 1)}
+          disabled={pageIndex === totalPages}
+        >
+          Próxima
+        </button>
       </div>
       {isCreateModalOpen && (
-        <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)}>
+        <Modal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+        >
           <h2 className="text-xl font-bold mb-4">Cadastrar Novo Usuário</h2>
           <form onSubmit={handleCreateSubmit}>
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">Username</label>
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="username"
+              >
+                Username
+              </label>
               <input
                 type="text"
                 name="username"
@@ -218,7 +256,12 @@ export default function UserSearchbar() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">Password</label>
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="password"
+              >
+                Password
+              </label>
               <input
                 type="password"
                 name="password"
@@ -229,7 +272,12 @@ export default function UserSearchbar() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="firstName">First Name</label>
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="firstName"
+              >
+                First Name
+              </label>
               <input
                 type="text"
                 name="firstName"
@@ -240,7 +288,12 @@ export default function UserSearchbar() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="lastName">Last Name</label>
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="lastName"
+              >
+                Last Name
+              </label>
               <input
                 type="text"
                 name="lastName"
@@ -251,7 +304,12 @@ export default function UserSearchbar() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">Email</label>
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="email"
+              >
+                Email
+              </label>
               <input
                 type="email"
                 name="email"
@@ -295,7 +353,7 @@ export default function UserSearchbar() {
           lastName={selectedUser.lastName}
           firstName={selectedUser.firstName}
           email={selectedUser.email}
-          active={selectedUser.active ? 'Active' : 'Inactive'}
+          active={selectedUser.active ? "Active" : "Inactive"}
           id={selectedUser.id}
         />
       )}

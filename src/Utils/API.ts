@@ -91,17 +91,18 @@ export const signIn = async (email: string, password: string) => {
 };
 
 export async function searchUsers(searchTerm: string, pageNumber: number) {
-  const response = await fetch(`http://localhost:3000/users/search?searchTerm=${searchTerm}&page=${pageNumber}&limit=10&sortBy=username&sortOrder=ASC`);
+  const response = await fetch(`http://localhost:3000/users/filter?searchTerm=${searchTerm}&pageIndex=${pageNumber}&pageSize=10`);
   if (!response.ok) {
     throw new Error('Sem resposta');
   }
   try {
     const data = await response.json();
+    console.log("API response data", data);
     return {
       data: Array.isArray(data.data) ? data.data : [],
-      totalPages: data.totalPages,
-      currentPage: data.currentPage, // Certifique-se de que currentPage está correto
-      totalItems: data.totalItems,
+      totalPages: Math.ceil(data.total/ data.limit),
+      currentPage: data.page, // Certifique-se de que currentPage está correto
+      totalItems: data.total,
     };
   } catch (error) {
     throw new Error('Erro ao buscar usuários');
