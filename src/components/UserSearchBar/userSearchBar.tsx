@@ -41,18 +41,20 @@ export default function UserSearchbar() {
   const [pageIndex, setPageIndex] = useState<number>(1);
   const [totalPages, setTotalPages] = useState(1);
   const isInitialMount = useRef(true);
+  const isInitialSearch = useRef(true);
+  const isInitialPageChange = useRef(true);
   const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       if (isSearching) {
         const response = await searchUsers(searchTerm, pageIndex);
-        console.log("Search response:", response);
+      
         setUsers(response.data);
         setTotalPages(response.totalPages);
       } else {
         const response = await dispatch(fetchUsers(pageIndex)).unwrap();
-        console.log("Fetch response:", response);
+   
         setUsers(response.data);
         setTotalPages(response.totalPages);
       }
@@ -60,6 +62,11 @@ export default function UserSearchbar() {
 
     if (isInitialMount.current) {
       isInitialMount.current = false;
+      fetchData(); // Adicione esta linha para garantir a requisição inicial
+    } else if (isSearching && isInitialSearch.current) {
+      isInitialSearch.current = false;
+    } else if (isInitialPageChange.current) { // Adicione esta condição
+      isInitialPageChange.current = false;
     } else {
       fetchData();
     }
@@ -68,15 +75,16 @@ export default function UserSearchbar() {
   const handleSearch = async () => {
     setPageIndex(1);
     setIsSearching(true);
-    console.log("Searching for:", searchTerm); // Reset page index on search
+    isInitialSearch
+   // Reset page index on search
     if (searchTerm) {
       const response = await searchUsers(searchTerm, 1);
-      console.log("Search response:", response);
+    
       setUsers(response.data);
       setTotalPages(response.totalPages);
     } else {
       const response = await dispatch(fetchUsers(1)).unwrap();
-      console.log("Fetch response:", response);
+      
       setUsers(response.data);
       setTotalPages(response.totalPages);
     }
@@ -86,15 +94,16 @@ export default function UserSearchbar() {
       return;
     }
     setPageIndex(newPageIndex);
-    console.log("Changing to page:", newPageIndex);
+    isInitialPageChange.current = true;
+    ;
     if (isSearching) {
       const response = await searchUsers(searchTerm, newPageIndex);
-      console.log("Search response:", response);
+      
       setUsers(response.data);
       setTotalPages(response.totalPages);
     } else {
       const response = await dispatch(fetchUsers(newPageIndex)).unwrap();
-      console.log("Fetch response:", response);
+      
       setUsers(response.data);
       setTotalPages(response.totalPages);
     }

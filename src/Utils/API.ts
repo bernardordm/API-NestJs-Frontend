@@ -97,7 +97,6 @@ export async function searchUsers(searchTerm: string, pageNumber: number) {
   }
   try {
     const data = await response.json();
-    console.log("API response data", data);
     return {
       data: Array.isArray(data.data) ? data.data : [],
       totalPages: Math.ceil(data.total/ data.limit),
