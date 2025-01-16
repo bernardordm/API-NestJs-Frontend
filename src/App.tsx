@@ -5,6 +5,7 @@ import UserDetails from './Pages/UserManagement/UserDetails';
 import SignupPage from './Pages/UserManagement/UserSignup';
 import Login from './Pages/Login/Login';
 import Home from './Pages/Home/Home';
+import SMSPage from './Pages/SMSPage/sms-Page';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Route path="/UserManagement/details/:id" element={<UserDetails />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/home" element={<Login />} />
+      <Route path="/sms" element={<SMSPage />} />
     </Routes>
   );
 }
