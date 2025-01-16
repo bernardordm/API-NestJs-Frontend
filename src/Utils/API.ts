@@ -108,7 +108,7 @@ export async function searchUsers(searchTerm: string, pageNumber: number) {
   }
 }
 export async function sendSMS(phoneNumber: string, message: string) {
-  const response = await fetch('http://localhost:3000/sms/send', {
+  const response = await fetch('http://localhost:3001/sms/send', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -116,11 +116,10 @@ export async function sendSMS(phoneNumber: string, message: string) {
     body: JSON.stringify({ phoneNumber, message }),
   });
 
-  if(!response.ok){
+  if (!response.ok) {
     throw new Error('Erro ao enviar SMS');
   }
 
   const data = await response.json();
   return data;
-
 }
